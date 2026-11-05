@@ -1,0 +1,80 @@
+// Prisma schema — Stack Governance Studio
+// Catalog of cops, plugins, style-guide mappings, agent skills, and saved team presets.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// A RuboCop cop seeded from the style guides (Ruby / Rails / RSpec + plugins).
+model Cop {
+  id           String  @id @default(cuid())
+  name         String  @unique
+  department   String
+  plugin       String
+  summary      String
+  options      String?
+  guideUrl     String?
+  defaultState String
+  autoCorrect  Boolean @default(true)
+  corpusNote   String?
+  betterNote   String?
+
+  @@index([department])
+  @@index([plugin])
+}
+
+// A RuboCop plugin extension (rubocop-rails, rubocop-rspec, ...).
+model Plugin {
+  id          String  @id @default(cuid())
+  key         String  @unique
+  gem         String
+  name        String
+  description String
+  category    String
+  docsUrl     String?
+  defaultOn   Boolean @default(true)
+}
+
+// A mentor-corpus / BetterSpecs rule mapped to the cop enforcing it.
+model Mapping {
+  id       String  @id @default(cuid())
+  source   String
+  feedback String
+  cop      String
+  config   String
+  note     String?
+
+  @@index([source])
+}
+
+// An agent-executable skill from the ruby-agent-skills or react-agent-skills pack.
+// Follows the Agent Skills specification (agentskills.io).
+model Skill {
+  id             String  @id @default(cuid())
+  name           String
+  family         String
+  repo           String
+  description    String
+  triggers       String?
+  alwaysConsider Boolean @default(false)
+  deprecated     Boolean @default(false)
+  supersededBy   String?
+
+  @@unique([repo, name])
+  @@index([family])
+  @@index([repo])
+}
+
+// A team-saved builder configuration.
+model SavedPreset {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?
+  config      String
+  createdAt   DateTime @default(now())
+}
