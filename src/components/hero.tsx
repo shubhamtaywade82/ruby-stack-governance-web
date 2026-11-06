@@ -78,9 +78,9 @@ export function Hero() {
           <p className="mt-5 max-w-xl text-lg text-muted-foreground text-pretty">
             Pick your Ruby and Rails targets, plugins and strictness — the studio emits a complete{" "}
             <span className="font-medium text-foreground">.rubocop.yml</span>, Gemfile group, CI
-            gates and lint script. When the frontend is React, route the same discipline through
-            the governed{" "}
-            <span className="font-medium text-foreground">agent skill packs</span> — 230+ skills
+            gates and lint script. When the frontend is React or the backend is Node.js, route the
+            same discipline through the governed{" "}
+            <span className="font-medium text-foreground">agent skill packs</span> — 570+ skills
             covering every boundary of the stack.
           </p>
           <div className="mt-7 flex flex-wrap items-center gap-3">

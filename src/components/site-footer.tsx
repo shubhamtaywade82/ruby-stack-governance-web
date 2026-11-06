@@ -27,6 +27,10 @@ const LINK_GROUPS = [
         label: "react-agent-skills",
         href: "https://github.com/shubhamtaywade82/react-agent-skills",
       },
+      {
+        label: "node-agent-skills",
+        href: "https://github.com/shubhamtaywade82/node-agent-skills",
+      },
       { label: "Agent Skills spec", href: "https://agentskills.io/specification" },
       { label: "skills CLI (npx)", href: "https://github.com/vercel-labs/skills" },
     ],

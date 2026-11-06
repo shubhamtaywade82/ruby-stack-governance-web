@@ -18,15 +18,19 @@ interface SkillsResponse {
 const REPO_LABEL: Record<string, string> = {
   "ruby-agent-skills": "Ruby · Rails",
   "react-agent-skills": "React · TypeScript",
+  "node-agent-skills": "Node.js · TypeScript",
 };
 
 const REPO_URL: Record<string, string> = {
   "ruby-agent-skills": "https://github.com/shubhamtaywade82/ruby-agent-skills",
   "react-agent-skills": "https://github.com/shubhamtaywade82/react-agent-skills",
+  "node-agent-skills": "https://github.com/shubhamtaywade82/node-agent-skills",
 };
 
 function repoShort(repo: string) {
-  return repo === "ruby-agent-skills" ? "ruby" : "react";
+  if (repo === "ruby-agent-skills") return "ruby";
+  if (repo === "node-agent-skills") return "node";
+  return "react";
 }
 
 export function SkillsExplorer() {
@@ -71,14 +75,16 @@ export function SkillsExplorer() {
             03 · Skill library
           </p>
           <h2 className="mt-2 text-2xl font-bold tracking-tight sm:text-3xl">
-            Agent-executable skills, two governed packs
+            Agent-executable skills, three governed packs
           </h2>
           <p className="mt-3 text-muted-foreground">
             Every skill from <span className="font-medium text-foreground">ruby-agent-skills</span>{" "}
-            (Ruby · Rails · workflow) and{" "}
+            (Ruby · Rails · workflow),{" "}
             <span className="font-medium text-foreground">react-agent-skills</span> (React ·
-            TypeScript · frontend) — with routing triggers, families, deprecation succession and the
-            pack defaults the agent must always consider.
+            TypeScript · frontend) and{" "}
+            <span className="font-medium text-foreground">node-agent-skills</span> (Node.js ·
+            TypeScript · backend, incl. its adapter skills) — with routing triggers, families,
+            deprecation succession and the pack defaults the agent must always consider.
           </p>
         </div>
 
@@ -135,7 +141,9 @@ export function SkillsExplorer() {
                   repo === r.name
                     ? r.name === "ruby-agent-skills"
                       ? "border-rose-500 bg-rose-600 text-white hover:bg-rose-700"
-                      : "border-violet-500 bg-violet-600 text-white hover:bg-violet-700"
+                      : r.name === "node-agent-skills"
+                        ? "border-emerald-500 bg-emerald-600 text-white hover:bg-emerald-700"
+                        : "border-violet-500 bg-violet-600 text-white hover:bg-violet-700"
                     : "bg-background text-muted-foreground hover:border-rose-300 hover:text-foreground dark:hover:border-rose-800",
                 )}
               >
@@ -144,7 +152,12 @@ export function SkillsExplorer() {
             ))}
           </div>
 
-          <div className="flex flex-wrap gap-1.5" role="group" aria-label="Filter by family">
+          <div
+            className="flex max-h-[5.5rem] flex-wrap gap-1.5 overflow-y-auto pr-1 scrollbar-slim"
+            role="group"
+            aria-label="Filter by family"
+            tabIndex={0}
+          >
             <button
               type="button"
               onClick={() => setFamily("All")}
@@ -158,7 +171,7 @@ export function SkillsExplorer() {
             >
               All families
             </button>
-            {(data?.families ?? []).slice(0, 18).map((f) => (
+            {(data?.families ?? []).map((f) => (
                 <button
                   key={f.name}
                   type="button"
@@ -214,7 +227,9 @@ export function SkillsExplorer() {
                                 ? "text-muted-foreground line-through decoration-rose-400/60"
                                 : skill.repo === "ruby-agent-skills"
                                   ? "text-rose-700 dark:text-rose-400"
-                                  : "text-violet-700 dark:text-violet-400",
+                                  : skill.repo === "node-agent-skills"
+                                    ? "text-emerald-700 dark:text-emerald-400"
+                                    : "text-violet-700 dark:text-violet-400",
                             )}
                           >
                             {skill.name}
@@ -264,7 +279,9 @@ export function SkillsExplorer() {
                             "text-[10px]",
                             skill.repo === "ruby-agent-skills"
                               ? "border-rose-200 text-rose-700 dark:border-rose-900 dark:text-rose-400"
-                              : "border-violet-200 text-violet-700 dark:border-violet-900 dark:text-violet-400",
+                              : skill.repo === "node-agent-skills"
+                                ? "border-emerald-200 text-emerald-700 dark:border-emerald-900 dark:text-emerald-400"
+                                : "border-violet-200 text-violet-700 dark:border-violet-900 dark:text-violet-400",
                           )}
                         >
                           {repoShort(skill.repo)}
