@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Stack Governance Studio — Ruby · Rails · React enforcement, generated",
+  title: "Stack Governance Studio — Ruby · Rails · React · Node enforcement, generated",
   description:
     "Deterministic, organization-wide engineering governance: generate .rubocop.yml, Gemfile groups, CI gates and lint scripts for Ruby and Rails, browse the full cop catalog, and route the agent-executable ruby-agent-skills and react-agent-skills packs.",
   keywords: [

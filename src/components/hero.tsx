@@ -69,7 +69,7 @@ export function Hero() {
             className="mb-5 gap-1.5 border-rose-300 bg-rose-50 text-rose-700 dark:border-rose-900 dark:bg-rose-950/40 dark:text-rose-300"
           >
             <Sparkles className="size-3.5" aria-hidden />
-            Deterministic · Ruby · Rails · React
+            Deterministic · Ruby · Rails · React · Node
           </Badge>
           <h1 className="text-4xl font-bold tracking-tight text-balance sm:text-5xl">
             Organization-wide stack enforcement,{" "}
