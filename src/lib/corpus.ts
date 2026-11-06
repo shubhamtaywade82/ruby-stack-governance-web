@@ -75,6 +75,12 @@ interface GithubCommit {
 let cache: { t: number; data: Corpus } | null = null;
 const TTL_MS = 60_000;
 
+// Commit-attribution memo: { fetchedAt, head | null }. Null heads retry on a
+// shorter window so recovery is quick, successes hold for 30 minutes.
+let headCache: { t: number; head: GithubCommit | null } | null = null;
+const HEAD_TTL_MS = 30 * 60_000;
+const HEAD_RETRY_MS = 5 * 60_000;
+
 export async function getCorpus(): Promise<Corpus> {
   if (cache && Date.now() - cache.t < TTL_MS) return cache.data;
 
@@ -100,26 +106,33 @@ export async function getCorpus(): Promise<Corpus> {
   }
 
   // Commit metadata is best-effort: GitHub's REST API requires a User-Agent
-  // header and is anonymous-rate-limited (60/hr). If it fails, we still serve
-  // the corpus (raw succeeded) with an empty sha rather than 502.
-  let head: GithubCommit | null = null;
-  try {
-    // Anonymous GitHub API budget is 60 req/hr per IP. Polling the commits
-    // endpoint every 60s exhausts it in the first hour and freezes (or
-    // degrades) attribution for everyone behind this IP — so attribution
-    // refreshes on a 30-minute window instead. Corpus files above stay on
-    // the 60s window; raw.githubusercontent.com is not rate-limited.
-    const headRes = await fetch(COMMITS_URL, {
-      next: { revalidate: 1800 },
-      headers: {
-        Accept: "application/vnd.github+json",
-        "User-Agent": "ruby-stack-governance-web",
-      },
-    });
-    if (headRes.ok) head = (await headRes.json()) as GithubCommit;
-  } catch {
-    head = null;
+  // header and is anonymous-rate-limited (60/hr per IP — and on shared egress
+  // IPs other tenants can exhaust it). If it fails, we still serve the
+  // corpus (raw succeeded) with an empty sha rather than 502; the UI then
+  // shows the honest “live (commit metadata rate-limited)” pill.
+  //
+  // Attribution owns its own budget instead of Next's data cache: a success
+  // holds for 30 minutes, a failure retries every 5 minutes, and a failed
+  // lookup never serves a stale sha — corpus and attribution can never
+  // disagree silently. Corpus files above stay on the 60s window;
+  // raw.githubusercontent.com is not rate-limited.
+  if (!headCache || Date.now() - headCache.t > (headCache.head ? HEAD_TTL_MS : HEAD_RETRY_MS)) {
+    let fetched: GithubCommit | null = null;
+    try {
+      const headRes = await fetch(COMMITS_URL, {
+        cache: "no-store",
+        headers: {
+          Accept: "application/vnd.github+json",
+          "User-Agent": "ruby-stack-governance-web",
+        },
+      });
+      if (headRes.ok) fetched = (await headRes.json()) as GithubCommit;
+    } catch {
+      fetched = null;
+    }
+    headCache = { t: Date.now(), head: fetched };
   }
+  const head = headCache.head;
 
   const [ratchetsText, manifestText] = await Promise.all([
     ratchetsRes.text(),
