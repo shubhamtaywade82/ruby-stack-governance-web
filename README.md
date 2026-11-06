@@ -33,7 +33,7 @@ degrades to a "live (commit metadata rate-limited)" pill rather than failing.
 ## Sections
 
 1. **Hero** — what the system is.
-2. **Corpus** — live ratchets + manifest, attributed to the source commit.
+2. **Corpus** — live ratchets + manifest with stack filters (ruby / rails / react / typescript), attributed to the source commit.
 3. **Builder** — compose a `.rubocop.yml` preset.
 4. **Cop Explorer** — browse the RuboCop canon (departments, plugins, options).
 5. **Skills Explorer** — Claude/Cursor skills mirrored from the corpus.

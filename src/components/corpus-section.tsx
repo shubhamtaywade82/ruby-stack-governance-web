@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   Card,
   CardContent,
@@ -36,6 +36,7 @@ const LAYER_TONE: Record<string, string> = {
 
 export function CorpusSection() {
   const [state, setState] = useState<State>({ status: "loading" });
+  const [stackFilter, setStackFilter] = useState<string>("all");
 
   const load = useCallback(async () => {
     setState({ status: "loading" });
@@ -55,6 +56,23 @@ export function CorpusSection() {
   useEffect(() => {
     void load();
   }, [load]);
+
+  const stackCounts = useMemo(() => {
+    const counts = new Map<string, number>();
+    if (state.status !== "ready") return counts;
+    for (const a of state.corpus.manifest.artifacts) {
+      for (const s of a.stacks) counts.set(s, (counts.get(s) ?? 0) + 1);
+    }
+    return counts;
+  }, [state]);
+
+  const visibleArtifacts = useMemo(() => {
+    if (state.status !== "ready") return [];
+    if (stackFilter === "all") return state.corpus.manifest.artifacts;
+    return state.corpus.manifest.artifacts.filter((a) =>
+      a.stacks.includes(stackFilter)
+    );
+  }, [state, stackFilter]);
 
   const mirrored = state.status === "ready"
     ? state.corpus.manifest.artifacts.filter((a) => a.mirror).length
@@ -236,8 +254,45 @@ export function CorpusSection() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
+                <div
+                  className="mb-4 flex flex-wrap items-center gap-2"
+                  role="group"
+                  aria-label="Filter artifacts by stack"
+                >
+                  {["all", ...[...stackCounts.keys()]].map((stack) => {
+                    const count =
+                      stack === "all"
+                        ? state.status === "ready"
+                          ? state.corpus.manifest.artifacts.length
+                          : 0
+                        : (stackCounts.get(stack) ?? 0);
+                    const active = stackFilter === stack;
+                    return (
+                      <button
+                        key={stack}
+                        type="button"
+                        onClick={() => setStackFilter(stack)}
+                        aria-pressed={active}
+                        className={`rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
+                          active
+                            ? "border-foreground/60 bg-foreground text-background"
+                            : "border-border bg-background text-muted-foreground hover:text-foreground"
+                        }`}
+                      >
+                        {stack}
+                        <span
+                          className={`ml-1.5 tabular-nums ${
+                            active ? "opacity-70" : "opacity-50"
+                          }`}
+                        >
+                          {count}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
                 <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                  {state.corpus.manifest.artifacts.map((a) => (
+                  {visibleArtifacts.map((a) => (
                     <a
                       key={a.id}
                       className="group rounded-lg border border-border bg-background p-3 transition-colors hover:border-foreground/30 hover:bg-accent/40"
