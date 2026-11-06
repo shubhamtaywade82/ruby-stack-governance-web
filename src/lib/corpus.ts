@@ -104,8 +104,13 @@ export async function getCorpus(): Promise<Corpus> {
   // the corpus (raw succeeded) with an empty sha rather than 502.
   let head: GithubCommit | null = null;
   try {
+    // Anonymous GitHub API budget is 60 req/hr per IP. Polling the commits
+    // endpoint every 60s exhausts it in the first hour and freezes (or
+    // degrades) attribution for everyone behind this IP — so attribution
+    // refreshes on a 30-minute window instead. Corpus files above stay on
+    // the 60s window; raw.githubusercontent.com is not rate-limited.
     const headRes = await fetch(COMMITS_URL, {
-      next: { revalidate: 60 },
+      next: { revalidate: 1800 },
       headers: {
         Accept: "application/vnd.github+json",
         "User-Agent": "ruby-stack-governance-web",
