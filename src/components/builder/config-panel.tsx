@@ -122,7 +122,7 @@ export function ConfigPanel(props: ConfigPanelProps) {
   const railsSelected = config.plugins.includes("rubocop-rails");
 
   return (
-    <div className="space-y-4">
+    <div className="min-w-0 space-y-4">
       {/* ── Targets ─────────────────────────────────────────────────────── */}
       <Card className="py-4">
         <CardHeader className="pb-3">
@@ -131,7 +131,7 @@ export function ConfigPanel(props: ConfigPanelProps) {
             Lock versions deterministically — prevents false positives during upgrades.
           </CardDescription>
         </CardHeader>
-        <CardContent className="grid grid-cols-2 gap-3">
+        <CardContent className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <div>
             <Label htmlFor="ruby-version" className="text-xs">
               Ruby
@@ -186,7 +186,7 @@ export function ConfigPanel(props: ConfigPanelProps) {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
             {PRESETS.map((p) => {
               const isActive = config.preset === p.key;
               return (

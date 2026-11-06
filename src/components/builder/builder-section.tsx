@@ -173,7 +173,7 @@ export function BuilderSection() {
           </p>
         </div>
 
-        <div className="mt-8 grid items-start gap-6 lg:grid-cols-[minmax(0,420px)_minmax(0,1fr)]">
+        <div className="mt-8 grid grid-cols-1 items-start gap-6 lg:grid-cols-[minmax(0,420px)_minmax(0,1fr)]">
           <ConfigPanel
             config={config}
             plugins={plugins}
